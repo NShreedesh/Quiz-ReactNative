@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {Alert, Modal, StyleSheet, Text, ToastAndroid, View} from 'react-native';
 import React, {useState} from 'react';
 import Answer from './Answer';
 import Question from './Question';
@@ -10,16 +10,27 @@ enum QuestionCountChangeState {
   Decrement,
 }
 
+export enum AnswerState {
+  none,
+  correct,
+  wrong,
+}
+
 export default function Quiz() {
   const [questionCount, setQuestionCount] = useState<number>(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number>(0);
+  const [isAnswerSelected, setIsAnswerSelected] = useState<boolean>(false);
 
   function onAnswerPresssed(answerNumber: number) {
     if (answerNumber === quizData[questionCount].correctAnswer) {
-      changeQuestionCount(QuestionCountChangeState.Increment);
+      console.log('Correct Answer');
     } else {
       console.log('Wrong Anwser');
     }
+    setIsAnswerSelected(true);
+  }
+
+  function getAnswerState(isCorrectAnswer: boolean): AnswerState {
+    return isCorrectAnswer ? AnswerState.correct : AnswerState.wrong;
   }
 
   function changeQuestionCount(state: QuestionCountChangeState) {
@@ -56,7 +67,13 @@ export default function Quiz() {
               answer={answer}
               onAnswerPressed={onAnswerPresssed}
               answerNumber={index}
-              selected={1}
+              answerState={
+                isAnswerSelected
+                  ? getAnswerState(
+                      index === quizData[questionCount].correctAnswer,
+                    )
+                  : AnswerState.none
+              }
             />
           );
         })}
@@ -72,7 +89,12 @@ export default function Quiz() {
         <MyButton
           title="Next"
           onpressed={() => {
+            if (!isAnswerSelected) {
+              ToastAndroid.show('select your answer.', ToastAndroid.SHORT);
+              return;
+            }
             changeQuestionCount(QuestionCountChangeState.Increment);
+            setIsAnswerSelected(false);
           }}
           flex={1}
         />

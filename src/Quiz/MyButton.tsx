@@ -1,19 +1,15 @@
 import {View, Text, TouchableHighlight, StyleSheet, Image} from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {AnswerState} from './Quiz';
 
 interface IButton {
   title: string;
   onpressed?: () => void;
   flex?: number;
+  answerState?: AnswerState;
 }
 
-enum AnswerState {
-  none,
-  correct,
-  wrong,
-}
-
-export default function Button({title, onpressed, flex}: IButton) {
+export default function Button({title, onpressed, flex, answerState}: IButton) {
   function getIcon(state: AnswerState) {
     switch (state) {
       case AnswerState.correct:
@@ -30,13 +26,15 @@ export default function Button({title, onpressed, flex}: IButton) {
       onPress={onpressed}>
       <View style={style.answerInnerView}>
         <Text style={style.titleText}>{title}</Text>
-        <Image
-          style={{
-            height: 20,
-            width: 20,
-          }}
-          source={getIcon(AnswerState.none)}
-        />
+        {answerState != AnswerState.none && answerState !== undefined && (
+          <Image
+            style={{
+              height: 20,
+              width: 20,
+            }}
+            source={getIcon(answerState)}
+          />
+        )}
       </View>
     </TouchableHighlight>
   );
