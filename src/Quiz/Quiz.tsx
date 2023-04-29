@@ -135,7 +135,10 @@ export default function Quiz() {
             changeQuestionCount(QuestionCountChangeState.Increment);
 
             if (selectedAnswers.length === quizData.length) {
-              Alert.alert('Score', `${correctAnswerCount.toString()}`);
+              ToastAndroid.show(
+                `Score: ${correctAnswerCount.toString()}`,
+                ToastAndroid.LONG,
+              );
             }
           }}
           flex={1}
