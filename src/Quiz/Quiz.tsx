@@ -1,11 +1,12 @@
-import {Alert, Modal, StyleSheet, Text, ToastAndroid, View} from 'react-native';
-import React, {useState} from 'react';
+import {Alert, StyleSheet, Text, ToastAndroid, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import Answer from './Answer';
 import Question from './Question';
 import {quizData} from '../Data/QuizData';
 import MyButton from './MyButton';
 
 interface IAnswers {
+  questionNumber: number;
   selectedAnswer: number;
 }
 
@@ -24,23 +25,44 @@ export default function Quiz() {
   const [questionCount, setQuestionCount] = useState<number>(0);
   const [isAnswerSelected, setIsAnswerSelected] = useState<boolean>(false);
   const [selectedAnswers, setSelectedAnswers] = useState<IAnswers[]>([]);
+  const [correctAnswerCount, setCorrectAnswerCount] = useState<number>(0);
+
+  useEffect(() => {
+    setIsAnswerSelected(doesAnswerAlreadyExist());
+  }, [questionCount]);
 
   function onAnswerPresssed(answerNumber: number) {
-    if (answerNumber === quizData[questionCount].correctAnswer) {
-      console.log('Correct Answer');
-    } else {
-      console.log('Wrong Anwser');
-    }
-    setIsAnswerSelected(true);
+    if (doesAnswerAlreadyExist()) return;
+
     setSelectedAnswers(prev => {
       return [
         ...prev,
         {
           selectedAnswer: answerNumber,
+          questionNumber: questionCount,
         },
       ];
     });
+    setIsAnswerSelected(true);
+
+    if (answerNumber === quizData[questionCount].correctAnswer) {
+      setCorrectAnswerCount(prev => prev + 1);
+    } else {
+      console.log('Wrong Anwser');
+    }
   }
+
+  function doesAnswerAlreadyExist() {
+    console.log(questionCount);
+
+    const answer = selectedAnswers.find(
+      answer => questionCount == answer.questionNumber,
+    );
+    if (answer) return true;
+    else return false;
+  }
+
+  console.log(selectedAnswers);
 
   function getAnswerState(isCorrectAnswer: boolean): AnswerState {
     return isCorrectAnswer ? AnswerState.correct : AnswerState.wrong;
@@ -50,13 +72,17 @@ export default function Quiz() {
     switch (state) {
       case QuestionCountChangeState.Decrement:
         setQuestionCount(prev => {
-          if (prev > 0) return prev - 1;
+          if (prev > 0) {
+            return prev - 1;
+          }
           return prev;
         });
         break;
       case QuestionCountChangeState.Increment:
         setQuestionCount(prev => {
-          if (prev < quizData.length - 1) return prev + 1;
+          if (prev < quizData.length - 1) {
+            return prev + 1;
+          }
           return prev;
         });
         break;
@@ -100,14 +126,17 @@ export default function Quiz() {
           flex={1}
         />
         <MyButton
-          title="Next"
+          title={selectedAnswers.length === quizData.length ? 'Finish' : 'Next'}
           onpressed={() => {
             if (!isAnswerSelected) {
               ToastAndroid.show('select your answer.', ToastAndroid.SHORT);
               return;
             }
             changeQuestionCount(QuestionCountChangeState.Increment);
-            setIsAnswerSelected(false);
+
+            if (selectedAnswers.length === quizData.length) {
+              Alert.alert('Score', `${correctAnswerCount.toString()}`);
+            }
           }}
           flex={1}
         />
