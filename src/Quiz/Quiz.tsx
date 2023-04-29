@@ -5,6 +5,10 @@ import Question from './Question';
 import {quizData} from '../Data/QuizData';
 import MyButton from './MyButton';
 
+interface IAnswers {
+  selectedAnswer: number;
+}
+
 enum QuestionCountChangeState {
   Increment,
   Decrement,
@@ -19,6 +23,7 @@ export enum AnswerState {
 export default function Quiz() {
   const [questionCount, setQuestionCount] = useState<number>(0);
   const [isAnswerSelected, setIsAnswerSelected] = useState<boolean>(false);
+  const [selectedAnswers, setSelectedAnswers] = useState<IAnswers[]>([]);
 
   function onAnswerPresssed(answerNumber: number) {
     if (answerNumber === quizData[questionCount].correctAnswer) {
@@ -27,6 +32,14 @@ export default function Quiz() {
       console.log('Wrong Anwser');
     }
     setIsAnswerSelected(true);
+    setSelectedAnswers(prev => {
+      return [
+        ...prev,
+        {
+          selectedAnswer: answerNumber,
+        },
+      ];
+    });
   }
 
   function getAnswerState(isCorrectAnswer: boolean): AnswerState {
