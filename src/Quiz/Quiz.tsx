@@ -1,4 +1,13 @@
-import {Alert, StyleSheet, Text, ToastAndroid, View} from 'react-native';
+import {
+  Alert,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  TouchableHighlight,
+  View,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Answer from './Answer';
 import Question from './Question';
@@ -26,6 +35,7 @@ export default function Quiz() {
   const [isAnswerSelected, setIsAnswerSelected] = useState<boolean>(false);
   const [selectedAnswers, setSelectedAnswers] = useState<IAnswers[]>([]);
   const [correctAnswerCount, setCorrectAnswerCount] = useState<number>(0);
+  const [isGameFinished, setIsGameFinished] = useState<boolean>(false);
 
   useEffect(() => {
     setIsAnswerSelected(doesAnswerAlreadyExist());
@@ -123,6 +133,7 @@ export default function Quiz() {
           );
         })}
       </View>
+
       <View style={style.bottomButtons}>
         <MyButton
           color="#8B80B6"
@@ -145,6 +156,7 @@ export default function Quiz() {
             changeQuestionCount(QuestionCountChangeState.Increment);
 
             if (selectedAnswers.length === quizData.length) {
+              setIsGameFinished(true);
               ToastAndroid.show(
                 `Score: ${correctAnswerCount.toString()}`,
                 ToastAndroid.LONG,
@@ -154,6 +166,23 @@ export default function Quiz() {
           flex={1}
         />
       </View>
+
+      <Modal animationType="slide" visible={isGameFinished}>
+        <View style={style.scoreView}>
+          <Text style={style.score}>Score : {correctAnswerCount}</Text>
+          <TouchableHighlight
+            underlayColor="#188667"
+            style={style.replay}
+            onPress={() => {
+              setQuestionCount(0);
+              setSelectedAnswers([]);
+              setCorrectAnswerCount(0);
+              setIsGameFinished(false);
+            }}>
+            <Text style={style.replayText}>Replay</Text>
+          </TouchableHighlight>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -181,5 +210,26 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+  },
+  scoreView: {
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 20,
+  },
+  score: {
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  replay: {
+    backgroundColor: '#07a176',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 4,
+  },
+  replayText: {
+    fontSize: 16,
+    color: 'white',
   },
 });
