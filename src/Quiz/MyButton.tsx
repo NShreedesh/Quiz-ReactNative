@@ -1,5 +1,12 @@
-import {View, Text, TouchableHighlight, StyleSheet, Image} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TouchableHighlight,
+  StyleSheet,
+  Image,
+  ColorValue,
+} from 'react-native';
+import React from 'react';
 import {AnswerState} from './Quiz';
 
 interface IButton {
@@ -7,9 +14,18 @@ interface IButton {
   onpressed?: () => void;
   flex?: number;
   answerState?: AnswerState;
+  color: ColorValue;
+  underlayColor?: ColorValue;
 }
 
-export default function Button({title, onpressed, flex, answerState}: IButton) {
+export default function Button({
+  title,
+  onpressed,
+  flex,
+  answerState,
+  color,
+  underlayColor,
+}: IButton) {
   function getIcon(state: AnswerState) {
     switch (state) {
       case AnswerState.correct:
@@ -21,8 +37,8 @@ export default function Button({title, onpressed, flex, answerState}: IButton) {
 
   return (
     <TouchableHighlight
-      style={{...style.button, flex: flex}}
-      underlayColor={'#59489b'}
+      style={{...style.button, flex: flex, backgroundColor: color}}
+      underlayColor={underlayColor}
       onPress={onpressed}>
       <View style={style.answerInnerView}>
         <Text style={style.titleText}>{title}</Text>
@@ -43,7 +59,6 @@ export default function Button({title, onpressed, flex, answerState}: IButton) {
 const style = StyleSheet.create({
   button: {
     paddingVertical: 22,
-    backgroundColor: '#8B80B6',
     borderRadius: 4,
   },
   titleText: {

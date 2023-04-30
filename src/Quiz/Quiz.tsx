@@ -62,8 +62,6 @@ export default function Quiz() {
     else return false;
   }
 
-  console.log(selectedAnswers);
-
   function getAnswerState(isCorrectAnswer: boolean): AnswerState {
     return isCorrectAnswer ? AnswerState.correct : AnswerState.wrong;
   }
@@ -106,6 +104,7 @@ export default function Quiz() {
               answer={answer}
               onAnswerPressed={onAnswerPresssed}
               answerNumber={index}
+              correctAnswerNumber={quizData[questionCount].correctAnswer}
               answerState={
                 isAnswerSelected
                   ? getAnswerState(
@@ -113,12 +112,21 @@ export default function Quiz() {
                     )
                   : AnswerState.none
               }
+              isSelectedAnswer={
+                selectedAnswers.findIndex(
+                  answer =>
+                    answer.selectedAnswer === index &&
+                    answer.questionNumber === questionCount,
+                ) !== -1
+              }
             />
           );
         })}
       </View>
       <View style={style.bottomButtons}>
         <MyButton
+          color="#8B80B6"
+          underlayColor="#706796"
           title="Previous"
           onpressed={() => {
             changeQuestionCount(QuestionCountChangeState.Decrement);
@@ -126,6 +134,8 @@ export default function Quiz() {
           flex={1}
         />
         <MyButton
+          color="#8B80B6"
+          underlayColor="#706796"
           title={selectedAnswers.length === quizData.length ? 'Finish' : 'Next'}
           onpressed={() => {
             if (!isAnswerSelected) {
